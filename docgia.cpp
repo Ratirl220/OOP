@@ -1,176 +1,153 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
-#include <fstream>
 #include <string>
+#include <vector>
+
 using namespace std;
-
-class DocGia {
-protected:
-    string hoTen;
-    string ngayLapThe;
-    int soThangHieuLuc;
-public:
-    DocGia(string hoten = "", string ngaylapthe = "", int sothanghieuluc = 0) {
-        hoTen = hoten;
-        ngayLapThe = ngaylapthe;
-        soThangHieuLuc = sothanghieuluc;
-    }
-    virtual ~DocGia() {}
-    virtual int tinhTien() = 0; // hàm ?o, tính ti?n làm th? c?a m?t d?c gi?
-    friend istream& operator>>(istream& is, DocGia& dg) {
-        cout << "Nhap ho ten: ";
-        getline(is, dg.hoTen);
-        cout << "Nhap ngay lap the (dd/mm/yyyy): ";
-        getline(is, dg.ngayLapThe);
-        cout << "Nhap so thang hieu luc: ";
-        is >> dg.soThangHieuLuc;
-        return is;
-    }
-    friend ostream& operator<<(ostream& os, DocGia& dg) {
-        os << "Ho ten: " << dg.hoTen << endl;
-        os << "Ngay lap the: " << dg.ngayLapThe << endl;
-        os << "So thang hieu luc: " << dg.soThangHieuLuc << endl;
-        os << "Tien lam the: " << dg.tinhTien() << " VND" << endl;
-        return os;
-    }
+class docgia{
+	protected:
+		string hoten,ngay;
+		int sothang,gia;
+	public:
+	docgia(string hoten="",string ngay="",int sothang=0){
+		this->hoten=hoten;
+		this->ngay=ngay;
+		this->sothang=sothang;
+	}
+	virtual void nhap(){
+		cout<<endl;
+		cout<<"nhap ho ten :";cin>>ws;getline(cin,hoten);
+		cout<<"nhap ngay lap the :";cin>>ws;getline(cin,ngay);
+		cout<<"nhap so thang hieu luc cua the :";cin>>sothang;
+	}	
+	virtual void xuat(){
+		cout<<endl;
+		cout<<"ho & ten: "<<hoten<<endl;
+		cout<<"ngay lap the: "<<ngay<<endl;
+		cout<<"so thang co hieu luc cua the: "<<sothang<<endl;
+	}
+	friend istream& operator >>(istream& is,docgia& dg){
+		dg.nhap();
+		return is;
+	}
+	friend ostream& operator <<(ostream& os,docgia& dg){
+		dg.xuat();
+		return os;
+	}
+	virtual void tinhtien()=0;
+	int getgia(){
+		return gia;
+	}
+	int getsothang(){
+		return sothang;
+	}
+};
+class tre:public docgia{
+	private:
+		string tenbaby;
+	public:
+		void nhap(){
+			docgia::nhap();
+			cout<<"nhap ten thag dai dien: ";cin>>ws;getline(cin,tenbaby);
+		}
+		void xuat(){
+			docgia::xuat();
+			cout<<"tien lam the:"<<gia<<endl;
+			cout<<" ten thag dai dien:"<<tenbaby<<endl;
+		}
+		void tinhtien(){
+			gia=sothang*5000;
+		}
+};
+class lon:public docgia{
+	private:
+		string tengia;
+	public:
+		void nhap(){
+			docgia::nhap();
+			cout<<"nhap so cccd: ";cin>>ws;getline(cin,tengia);
+		}
+		void xuat(){
+			docgia::xuat();
+			cout<<"tien lam the:"<<gia<<endl;
+			cout<<" so cccd: "<<tengia<<endl;
+			
+		}
+		void tinhtien(){
+			gia=sothang*10000;
+		}
 };
 
-class DocGiaTreEm : public DocGia {
-private:
-    string hoTenNguoiDaiDien;
-public:
-    DocGiaTreEm(string hoten = "", string ngaylapthe = "", int sothanghieuluc = 0, string hotennguoidaidien = "") : DocGia(hoten, ngaylapthe, sothanghieuluc) {
-        hoTenNguoiDaiDien = hotennguoidaidien;
-    }
-    int tinhTien() {
-        return soThangHieuLuc * 5000;
-    }
-    friend istream& operator>>(istream& is, DocGiaTreEm& dgte) {
-    is >> static_cast<DocGia&>(dgte); // d?c thông tin chung c?a d?c gi?
-    cout << "Nhap ho ten nguoi dai dien: ";
-    getline(is, dgte.hoTenNguoiDaiDien);
-    return is;
-}
-friend ostream& operator<<(ostream& os, DocGiaTreEm& dgte) {
-    os << static_cast<DocGia&>(dgte); // xu?t thông tin chung c?a d?c gi?
-    os << "Ho ten nguoi dai dien: " << dgte.hoTenNguoiDaiDien << endl;
-    return os;
-}
+class menu{
+	private:
+		vector<docgia *>tv;
+		int n;
+	public:
+		void nhap(){
+			cout<<"nhap so luong: ";cin>>n;
+			for(int i=0;i<n;i++){
+			int loai;
+			cout<<"the cho lon or tre :"<<endl;
+			cout<<"1.tre em, 2. ng` lon: ";cin>>loai;
+			docgia *p;
+			if(loai==1){
+				p=new tre();
+			}
+			else{
+				p=new lon();
+			}
+			p->nhap();
+			tv.push_back(p);
+			}	
+			
+		}
+		void xuat(){
+			for(int i=0;i<tv.size();i++){
+				tv[i]->tinhtien();
+				tv[i]->xuat();
+			}
+		}
+		void sapxeptheotien(){
+			for(int i=0;i<tv.size()-1;i++){
+				for(int j=i+1;j<tv.size();j++){
+					if(tv[i]->getgia()>tv[j]->getgia()){
+						swap(tv[i],tv[j]);
+					}
+					
+				}
+			}
+		}
+		void sapxeptheothang(){
+			for(int i=0;i<tv.size()-1;i++){
+				for(int j=i+1;j<tv.size();j++){
+					if(tv[i]->getsothang()>tv[j]->getsothang()){
+						swap(tv[i],tv[j]);
+					}
+				}
+			}
+		}
+		void imenu(){
+			char op;
+			do{
+				system("cls");
+				cout<<"1.Nhap danh sach doc gia:"<<endl;
+				cout<<"2.Xuat danh sach doc gia:"<<endl;
+				cout<<"3.Sap xep theo tien:"<<endl;
+				cout<<"4.Sap xep theo thang:"<<endl;
+				cin>>op;
+				switch(op){
+					case('1'):nhap();break;
+					case('2'):xuat();
+					system("pause");break;
+					case('3'):sapxeptheotien();break;
+					case('4'):sapxeptheothang();break;
+					
+				}
+			}while(op!='0');
+		}
+	
 };
-
-class DocGiaNguoiLon : public DocGia {
-private:
-string soCMND;
-public:
-DocGiaNguoiLon(string hoten = "", string ngaylapthe = "", int sothanghieuluc = 0, string socmnd = "") : DocGia(hoten, ngaylapthe, sothanghieuluc) {
-soCMND = socmnd;
+int main(){
+	menu n;
+	n.imenu();
+	return 0;
 }
-int tinhTien() {
-return soThangHieuLuc * 10000;
-}
-friend istream& operator>>(istream& is, DocGiaNguoiLon& dgnl) {
-is >> static_cast<DocGia&>(dgnl); // d?c thông tin chung c?a d?c gi?
-cout << "Nhap so CMND: ";
-getline(is, dgnl.soCMND);
-return is;
-}
-friend ostream& operator<<(ostream& os, DocGiaNguoiLon& dgnl) {
-os << static_cast<DocGia&>(dgnl); // xu?t thông tin chung c?a d?c gi?
-os << "So CMND: " << dgnl.soCMND << endl;
-return os;
-}
-};
-
-class ThuVien {
-private:
-vector<DocGia*> dsDocGia;
-public:
-void nhapDS() { // nh?p danh sách các d?c gi?
-int n;
-cout << "Nhap so luong doc gia: ";
-cin >> n;
-cin.ignore(); // lo?i b? ký t? \n trong buffer
-for (int i = 0; i < n; i++) {
-cout << "Nhap thong tin doc gia thu " << i+1 << endl;
-cout << "Nhap loai doc gia (0 - Tre em, 1 - Nguoi lon): ";
-int loaiDG;
-cin >> loaiDG;
-cin.ignore(); // lo?i b? ký t? \n trong buffer
-switch (loaiDG) {
-case 0: {
-DocGiaTreEm* dgte = new DocGiaTreEm();
-cin >> *dgte;
-dsDocGia.push_back(dgte);
-break;
-}
-case 1: {
-DocGiaNguoiLon *dgnl = new DocGiaNguoiLon();
-cin >> *dgnl;
-dsDocGia.push_back(dgnl);
-break;
-}
-default:
-cout << "Loai doc gia khong hop le!" << endl;
-break;
-}
-}
-}
-void xuatDS() {
-for(auto it = dsDocGia.begin();it != dsDocGia.end(); it++) {
-cout << it << endl;
-}
-}
-int tinhTongTien() { 
-int tongTien = 0;
-for (auto it = dsDocGia.begin();it != dsDocGia.end(); it++) {
-tongTien += (it)->tinhTien(); 
-}
-return tongTien;
-}
-void sapXepTheoTien() { 
-sort(dsDocGia.begin(), dsDocGia.end(), [](DocGia a, DocGia b) {
-return a->tinhTien() > b->tinhTien();
-};
-}
-void sapXepTheoThang() { // s?p x?p danh sách các d?c gi? theo s? tháng có hi?u l?c tang d?n
-sort(dsDocGia.begin(), dsDocGia.end(), [](DocGia a, DocGia* b) {
-return a->getSoThangHieuLuc() < b->getSoThangHieuLuc();
-};
-
-void ghiDSVaoFile(string filename) { // ghi danh sách các d?c gi? vào file
-ofstream ofs(filename);
-if (!ofs.is_open()) {
-cout << "Khong mo duoc file de ghi!" << endl;
-return;
-}
-for (auto it = dsDocGia.begin(); it != dsDocGia.end(); it++) {
-ofs << **it << endl; // s? d?ng toán t? * hai l?n d? truy c?p d?n d?i tu?ng DocGia th?c s?
-}
-ofs.close();
-}
-};
-
-int main() {
-ThuVien tv;
-tv.nhapDS();
-cout << "Danh sach doc gia:\n";
-tv.xuatDS();
-
-cout << "\nTong tien lam the: " << tv.tinhTongTien() << " VND\n";
-
-tv.sapXepTheoTien();
-cout << "\nDanh sach doc gia sap xep theo tien lam the:\n";
-tv.xuatDS();
-
-tv.sapXepTheoThang();
-cout << "\nDanh sach doc gia sap xep theo so thang co hieu luc:\n";
-tv.xuatDS();
-
-tv.ghiDSVaoFile("dsdocgia.txt");
-cout << "\nDa ghi danh sach doc gia vao file dsdocgia.txt" << endl;
-
-return 0;
-}
-
-
